@@ -4,9 +4,12 @@ from wtforms import Form, TextField, validators, StringField, SubmitField
 from flask import session, flash, request, redirect, abort
 from sqlalchemy.orm import sessionmaker
 import os
+from tabledef import *
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+engine = create_engine('sqlite:///tutorial.db', echo=True)
 
 class UserForm(Form):
     username = StringField('Username', validators=[validators.required()])
