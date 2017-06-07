@@ -20,10 +20,44 @@ class UserForm(Form):
         blankData = MultiDict([ ('csrf', self.reset_csrf()) ])
         self.process(blankData)
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    todos = []
+
+    if session.get('logged_in'):
+        Session = sessionmaker(bind=engine)
+        s = Session()
+
+        current_user = s.query(User).get(session['user_id'])
+
+        if request.method == 'POST':
+            new_todo = request.form['todo']
+
+            if new_todo != '': #if not empty
+                todo = Todo(content=new_todo, user=current_user)
+                s.add(todo)
+                s.commit()
+
+        user_todos = current_user.todos.all()
+
+        for todo in user_todos:
+            todos.append([todo.id, todo.content])
+
+    return render_template('index.html',
+                            list=todos)
+
+@app.route('/delete')
+def delete():
+    if session.get('logged_in'):
+        Session = sessionmaker(bind=engine)
+        s = Session()
+
+        todo_id = int(request.args.get('id'))
+        todo = s.query(Todo).get(todo_id)
+        s.delete(todo)
+        s.commit()
+    return redirect('/')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():

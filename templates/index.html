@@ -1,5 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <p> Hello, world! </p>
+  <h1> Todos </h1>
+
+  {% if session['logged_in'] %}
+    <ul>
+      {% for todo in list %}
+        <li>
+          {{ todo[1] }}
+          [<a href={{'/delete?id=' + todo[0]|string}}>X</a>]
+        </li>
+      {% endfor %}
+    </ul>
+
+    <form action="" method="post" role="form">
+      <input type="text" name="todo" placeholder="New todo"> <br>
+      <input type="submit" value="add">
+    </form>
+  {% else %}
+    <p>Welcome to todos, a simple web app to keep track of tasks. <br>
+      If you're new, go sign up to get started. If you're a returning user, login to continue </p>
+  {% endif %}
 {% endblock %}
