@@ -48,5 +48,39 @@ def signup():
     return render_template('signup.html',
                             form=form)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = UserForm(request.form)
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if form.validate():
+            Session = sessionmaker(bind=engine)
+            s = Session()
+            query = s.query(User).filter(User.username.in_([username]), User.password.in_([password]))
+            result = query.first()
+
+            if result:
+                session['logged_in'] = True
+                session['user_id'] = result.id
+                session['username'] = username
+                flash('Welcome back, ' + session.get('username') + '!')
+            else:
+                flash('Sorry, invalid credentials. Try again')
+        else:
+            flash('Error: All fields of the form are required')
+
+    return render_template('login.html',
+                            form=form)
+
+@app.route('/logout')
+def logout():
+    session['logged_in'] = False
+    session['user_id'] = 0
+    session['username'] = 'Guest'
+    return redirect('/')
+
 app.secret_key = os.urandom(12)
 app.run(debug=True, port=5000)

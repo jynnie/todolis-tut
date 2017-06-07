@@ -5,8 +5,14 @@
   <body>
     <div> <!--Our header/navigation bar-->
       Todo:
-      <a href="/">Home</a> 
-      <a href="/signup">Sign Up</a>
+      <a href="/">Home</a>
+      {% if session['logged_in'] %}
+        <a href="/logout">Logout</a>
+        Hello, {{session['username']}}
+      {% else %}
+        <a href="/signup">Sign Up</a>
+        <a href="/login">Login</a>
+      {% endif %}
     </div>
     {% block content %}{% endblock %}
     <footer style="position: absolute; bottom: 10">
